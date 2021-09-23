@@ -20,6 +20,6 @@ $ flask db upgrade
 ```
     
 ### To run the app
-type python app.py in the cmd
-All the routes are in the folder routes in the file auth.py
-Database models in folder models in the file base_model.py
+1. type python app.py in the cmd
+2. All the routes are in the folder routes in the file auth.py
+3. Database models in folder models in the file base_model.py
