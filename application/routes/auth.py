@@ -102,4 +102,20 @@ def search_contacts():
             return jsonify({"data":data_contact})
             
         else:
-            return jsonify({"message":"contact does not exist"})            
+            return jsonify({"message":"contact does not exist"})           
+@auth_bp.route('/show_contact',methods=['GET'])
+@get_token
+def show_contact(value):
+    if request.method=='GET':
+        contacts = Contact.query.filter_by(user_id=value['id']).all()
+        data=[]
+        for i in contacts:
+            data_contact={}
+            data_contact['name']=i.name
+            data_contact['email']=i.email
+            data_contact['phone']=i.phone
+            data_contact['country']=i.country
+            data_contact['address']=i.address
+            data.append(data_contact)
+        return jsonify({"data":data}) 
+        
