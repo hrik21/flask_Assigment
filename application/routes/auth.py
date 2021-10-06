@@ -1,12 +1,26 @@
 from flask import Blueprint,jsonify,request
 from flask import Response
+import application
 from application.models.base_model import User,Contact
 from application import db
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from functools import wraps
 auth_bp = Blueprint("auth", __name__)
-
+def data(value):
+    details=[]
+    for i in value:
+        data_value={}
+        data_value["name"]=i.name
+        data_value['email']=i.email
+        data_value['phone']=i.phone
+        if type(value[0])==application.models.base_model.User:
+            data_value['password']=i.password
+        else:
+            data_value['country']=i.country            
+        data_value['address']=i.address
+        details.append(data_value)
+        return details
 def get_token(f):
     @wraps(f)
     def decorated():
@@ -49,16 +63,8 @@ def login():
 def user_details():
     if request.method=='GET':
         user=User.query.all()
-        details=[]
-        for i in user:
-            data_user={}
-            data_user['name']=i.name
-            data_user['email']=i.email
-            data_user['phone']=i.phone
-            data_user['password']=i.password
-            data_user['address']=i.address
-            details.append(data_user)
-        return jsonify({"data":details})
+        abc=data(user)
+        return jsonify({"data":abc})
 @auth_bp.route('/contact',methods=['POST'])
 @get_token
 def new_contact(value):
@@ -77,45 +83,31 @@ def new_contact(value):
 def show_contacts():
     if request.method=='GET':
         contact=Contact.query.all()
-        details=[]
-        for i in contact:
-            data_contact={}
-            data_contact['name']=i.name
-            data_contact['email']=i.email
-            data_contact['phone']=i.phone
-            data_contact['country']=i.country
-            data_contact['address']=i.address
-            details.append(data_contact)
-        return jsonify({"data":details})             
+        abc=data(contact)
+        return jsonify({"data":abc})             
 @auth_bp.route("/search",methods=['POST'])
 def search_contacts():
     if request.method=='POST':
-        data=request.get_json()
-        data= Contact.query.filter((Contact.email ==data["value"]) | (Contact.name == data["value"]) | (Contact.phone == data["value"]) ).first()
-        if data:
-            data_contact={}
-            data_contact['name']=data.name
-            data_contact['email']=data.email
-            data_contact['phone']=data.phone
-            data_contact['country']=data.country
-            data_contact['address']=data.address
-            return jsonify({"data":data_contact})
+        data_=request.get_json()
+        Data= Contact.query.filter((Contact.email ==data_["value"]) | (Contact.name == data_["value"]) | (Contact.phone == data_["value"]) ).all()
+        if Data:
+            abc=data(Data)
+            return jsonify({"data":abc})
             
         else:
-            return jsonify({"message":"contact does not exist"})           
+            return jsonify({"message":"contact does not exist"})   
 @auth_bp.route('/show_contact',methods=['GET'])
 @get_token
 def show_contact(value):
     if request.method=='GET':
         contacts = Contact.query.filter_by(user_id=value['id']).all()
-        data=[]
-        for i in contacts:
-            data_contact={}
-            data_contact['name']=i.name
-            data_contact['email']=i.email
-            data_contact['phone']=i.phone
-            data_contact['country']=i.country
-            data_contact['address']=i.address
-            data.append(data_contact)
-        return jsonify({"data":data}) 
-        
+        abc=data(contacts)
+        return jsonify({"data":abc})        
+@auth_bp.route('/user_token',methods=['GET'])
+@get_token
+def user_token(value):
+    if request.method=='GET':
+        user = User.query.filter_by(id=value['id']).all()
+        if user:
+            abc=data(user)
+        return jsonify({"data":abc})                     
