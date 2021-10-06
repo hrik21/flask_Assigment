@@ -20,7 +20,7 @@ def data(value):
             data_value['country']=i.country            
         data_value['address']=i.address
         details.append(data_value)
-        return details
+    return details
 def get_token(f):
     @wraps(f)
     def decorated():
