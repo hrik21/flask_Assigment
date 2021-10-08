@@ -9,17 +9,10 @@ from functools import wraps
 auth_bp = Blueprint("auth", __name__)
 def data(value):
     details=[]
-    for i in value:
-        data_value={}
-        data_value["name"]=i.name
-        data_value['email']=i.email
-        data_value['phone']=i.phone
-        if type(value[0])==application.models.base_model.User:
-            data_value['password']=i.password
-        else:
-            data_value['country']=i.country            
-        data_value['address']=i.address
-        details.append(data_value)
+    for i in range(len(value)):
+        object=value[i].__dict__
+        del object["_sa_instance_state"]
+        details.append(object)
     return details
 def get_token(f):
     @wraps(f)
@@ -110,4 +103,4 @@ def user_token(value):
         user = User.query.filter_by(id=value['id']).all()
         if user:
             abc=data(user)
-        return jsonify({"data":abc})                     
+        return jsonify({"data":abc})            
